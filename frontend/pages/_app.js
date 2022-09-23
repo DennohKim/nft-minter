@@ -46,6 +46,15 @@ const { connectors } = getDefaultWallets({
   chains,
 });
 
+//Initiliaze wagmi client
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+});
+
+
+
 
 
 function MyApp({ Component, pageProps }) {
