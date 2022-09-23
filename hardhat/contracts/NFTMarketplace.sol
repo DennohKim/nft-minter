@@ -57,6 +57,13 @@ contract NFTMarketplace {
         address seller
     );
 
+    event ListingPurchased(
+        address nftAddress,
+        uint256 tokenId,
+        address seller,
+        address buyer
+    );
+
     //Functions
     //----------------------------------------------------------------
 
@@ -126,5 +133,36 @@ contract NFTMarketplace {
 
         // Emit the event
         emit ListingUpdated(nftAddress, tokenId, newPrice, msg.sender);
+    }
+
+    //Purchase Listing Function
+
+    function purchaseListing(address nftAddress, uint256 tokenId)
+        external
+        payable
+        isListed(nftAddress, tokenId)
+    {
+        // Load the listing in a local copy
+        Listing memory listing = listings[nftAddress][tokenId];
+
+        // Buyer must have sent enough ETH
+        require(msg.value == listing.price, "MRKT: Incorrect ETH supplied");
+
+        // Delete listing from storage, save some gas
+        delete listings[nftAddress][tokenId];
+
+        // Transfer NFT from seller to buyer
+        IERC721(nftAddress).safeTransferFrom(
+            listing.seller,
+            msg.sender,
+            tokenId
+        );
+
+        // Transfer ETH sent from buyer to seller
+        (bool sent, ) = payable(listing.seller).call{value: msg.value}("");
+        require(sent, "Failed to transfer eth");
+
+        // Emit the event
+        emit ListingPurchased(nftAddress, tokenId, listing.seller, msg.sender);
     }
 }
