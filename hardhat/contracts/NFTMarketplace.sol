@@ -11,6 +11,9 @@ contract NFTMarketplace {
 
     mapping(address => mapping(uint256 => Listing)) public listings;
 
+    //modifiers
+    //----------------------------------------------------------------
+
     // Requires the msg.sender is the owner of the specified NFT
     modifier isNFTOwner(address nftAddress, uint256 tokenId) {
         require(
@@ -36,6 +39,7 @@ contract NFTMarketplace {
     }
 
     //Events
+    //----------------------------------------------------------------
 
     event ListingCreated(
         address nftAddress,
@@ -46,7 +50,16 @@ contract NFTMarketplace {
 
     event ListingCanceled(address nftAddress, uint256 tokenId, address seller);
 
+    event ListingUpdated(
+        address nftAddress,
+        uint256 tokenId,
+        uint256 newPrice,
+        address seller
+    );
+
     //Functions
+    //----------------------------------------------------------------
+
     //Create Listing Function
 
     function createListing(
@@ -100,5 +113,18 @@ contract NFTMarketplace {
     }
 
     //Update Listing Function
-    
+    function updateListing(
+        address nftAddress,
+        uint256 tokenId,
+        uint256 newPrice
+    ) external isListed(nftAddress, tokenId) isNFTOwner(nftAddress, tokenId) {
+        // Cannot update the price to be < 0
+        require(newPrice > 0, "MRKT: Price must be > 0");
+
+        // Update the listing price
+        listings[nftAddress][tokenId].price = newPrice;
+
+        // Emit the event
+        emit ListingUpdated(nftAddress, tokenId, newPrice, msg.sender);
+    }
 }
