@@ -32,3 +32,8 @@ main()
     console.error(error);
     process.exit(1);
   });
+
+//NFT Marketplace deployed contract - 0x109caE4FC90762F004fC9d49F016F7eA38Fc34Bb
+
+//Celo NFT - 0xd29891834e8033bdfaDAaD05Dd04116F2a90AD1B
+
