@@ -27,7 +27,6 @@ const celoChain = {
   testnet: true,
 };
 
-
 //Configure providers and connectors
 const { chains, provider } = configureChains(
   [celoChain],
@@ -53,12 +52,14 @@ const wagmiClient = createClient({
   provider,
 });
 
-
-
-
-
 function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+  return (
+    <WagmiConfig>
+      <RainbowKitProvider chains={chains}>
+        <Component {...pageProps} />
+      </RainbowKitProvider>
+    </WagmiConfig>
+  );
 }
 
-export default MyApp
+export default MyApp;
