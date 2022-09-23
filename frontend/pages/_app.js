@@ -5,6 +5,7 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
+//Create configuration object for alfajores
 const celoChain = {
   id: 44787,
   name: "Celo Alfajores Testnet",
@@ -25,6 +26,27 @@ const celoChain = {
   },
   testnet: true,
 };
+
+
+//Configure providers and connectors
+const { chains, provider } = configureChains(
+  [celoChain],
+  [
+    jsonRpcProvider({
+      rpc: (chain) => {
+        if (chain.id !== celoChain.id) return null;
+        return { http: chain.rpcUrls.default };
+      },
+    }),
+  ]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: "NFT Minter",
+  chains,
+});
+
+
 
 function MyApp({ Component, pageProps }) {
   return <Component {...pageProps} />
