@@ -35,6 +35,8 @@ contract NFTMarketplace {
         _;
     }
 
+    //Events
+
     event ListingCreated(
         address nftAddress,
         uint256 tokenId,
@@ -42,12 +44,20 @@ contract NFTMarketplace {
         address seller
     );
 
+    event ListingCanceled(address nftAddress, uint256 tokenId, address seller);
+
+    //Functions
+    //Create Listing Function
+
     function createListing(
         address nftAddress,
         uint256 tokenId,
         uint256 price
-    ) external isNotListed(nftAddress, tokenId)
-        isNFTOwner(nftAddress, tokenId) {
+    )
+        external
+        isNotListed(nftAddress, tokenId)
+        isNFTOwner(nftAddress, tokenId)
+    {
         // Cannot create a listing to sell NFT for < 0 ETH
         require(price > 0, "MRKT: Price must be > 0");
 
@@ -73,4 +83,22 @@ contract NFTMarketplace {
 
         emit ListingCreated(nftAddress, tokenId, price, msg.sender);
     }
+
+    //Cancel listing function
+
+    function cancelListing(address nftAddress, uint256 tokenId)
+        external
+        isListed(nftAddress, tokenId)
+        isNFTOwner(nftAddress, tokenId)
+    {
+        // Delete the Listing struct from the mapping
+        // Freeing up storage saves gas!
+        delete listings[nftAddress][tokenId];
+
+        // Emit the event
+        emit ListingCanceled(nftAddress, tokenId, msg.sender);
+    }
+
+    //Update Listing Function
+    
 }
