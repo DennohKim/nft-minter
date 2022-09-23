@@ -46,7 +46,8 @@ contract NFTMarketplace {
         address nftAddress,
         uint256 tokenId,
         uint256 price
-    ) external {
+    ) external isNotListed(nftAddress, tokenId)
+        isNFTOwner(nftAddress, tokenId) {
         // Cannot create a listing to sell NFT for < 0 ETH
         require(price > 0, "MRKT: Price must be > 0");
 
@@ -57,12 +58,7 @@ contract NFTMarketplace {
         );
 
         // Check caller is owner of NFT, and has approved
-        // the marketplace contract to transfer on their behalf
         IERC721 nftContract = IERC721(nftAddress);
-        require(
-            nftContract.ownerOf(tokenId) == msg.sender,
-            "MRKT: Not the owner"
-        );
         require(
             nftContract.isApprovedForAll(msg.sender, address(this)) ||
                 nftContract.getApproved(tokenId) == address(this),
@@ -74,5 +70,7 @@ contract NFTMarketplace {
             price: price,
             seller: msg.sender
         });
+
+        emit ListingCreated(nftAddress, tokenId, price, msg.sender);
     }
 }
